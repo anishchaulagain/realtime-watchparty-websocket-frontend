@@ -5,9 +5,10 @@ interface ChatBoxProps {
     username: string;
     messages: any[];
     onSendMessage: (text: string) => void;
+    className?: string;
 }
 
-export default function ChatBox({ username, messages, onSendMessage }: ChatBoxProps) {
+export default function ChatBox({ username, messages, onSendMessage, className = '' }: ChatBoxProps) {
     const [input, setInput] = useState('');
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -26,7 +27,7 @@ export default function ChatBox({ username, messages, onSendMessage }: ChatBoxPr
     };
 
     return (
-        <div className="flex flex-col h-[500px] bg-zinc-900/50 rounded-2xl border border-white/5 overflow-hidden">
+        <div className={`flex  flex-col bg-zinc-900/50 rounded-2xl border border-white/5 overflow-hidden ${className}`}>
             {/* Header */}
             <div className="p-4 border-b border-white/5 flex items-center justify-between bg-zinc-900">
                 <div className="flex items-center gap-2">
@@ -67,8 +68,8 @@ export default function ChatBox({ username, messages, onSendMessage }: ChatBoxPr
                                         </span>
                                     </div>
                                     <p className={`text-sm px-3 py-2 rounded-xl break-words ${isMe
-                                            ? 'bg-indigo-600 text-white rounded-br-sm'
-                                            : 'bg-zinc-800 text-zinc-200 rounded-bl-sm'
+                                        ? 'bg-indigo-600 text-white rounded-br-sm'
+                                        : 'bg-zinc-800 text-zinc-200 rounded-bl-sm'
                                         }`}>
                                         {msg.text}
                                     </p>

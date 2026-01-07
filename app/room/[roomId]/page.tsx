@@ -146,20 +146,24 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
             </header>
 
             {/* Main Content */}
-            <main className="max-w-6xl mx-auto p-4 lg:p-8 grid gap-8">
-                <VideoPlayer
-                    url={videoUrl}
-                    isPlaying={isPlaying}
-                    currentTime={currentTime}
-                    playbackRate={playbackRate}
-                    onProgress={onProgress}
-                    onPlay={onPlay}
-                    onPause={onPause}
-                    onSeek={onSeek}
-                />
+            <main className="max-w-[1400px] mx-auto p-4 lg:p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 h-[calc(100vh-80px)]">
 
-                {/* Controls */}
-                <div className="grid md:grid-cols-2 gap-8">
+                {/* Left Column (Video & Controls) - Spans 3 columns on LG */}
+                <div className="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col gap-6">
+                    {/* Video Player Section */}
+                    <div className="w-full">
+                        <VideoPlayer
+                            url={videoUrl}
+                            isPlaying={isPlaying}
+                            currentTime={currentTime}
+                            playbackRate={playbackRate}
+                            onProgress={onProgress}
+                            onPlay={onPlay}
+                            onPause={onPause}
+                            onSeek={onSeek}
+                        />
+                    </div>
+
                     {/* Source Control */}
                     <div className="space-y-4 p-6 bg-zinc-900/50 rounded-2xl border border-white/5">
                         <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">Video Source</h3>
@@ -201,15 +205,22 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
                             </label>
                         </div>
                     </div>
+                </div>
 
-                    {/* Chat System */}
-                    <div className="col-span-1">
-                        <ChatBox
-                            username={username}
-                            messages={messages}
-                            onSendMessage={sendMessage}
-                        />
-                    </div>
+                {/* Right Column (Chat) - Spans 1 column on LG, Full height */}
+                <div className="
+    col-span-1 
+    md:col-span-2 
+    lg:col-span-1
+    min-h-[420px]
+    lg:max-h-[75vh]
+">
+                    <ChatBox
+                        username={username}
+                        messages={messages}
+                        onSendMessage={sendMessage}
+                        className="h-full"
+                    />
                 </div>
             </main>
         </div>
