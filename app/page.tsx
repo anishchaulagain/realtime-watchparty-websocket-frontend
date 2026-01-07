@@ -35,7 +35,7 @@ export default function Home() {
       <div className="z-10 max-w-5xl w-full items-center justify-center font-mono text-sm lg:flex flex-col gap-12">
         <div className="text-center space-y-4 animate-in fade-in zoom-in duration-700">
           <h1 className="text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
-            WatchiParty
+            Anisync - Watch Live with Friends
           </h1>
           <p className="text-zinc-400 text-xl max-w-lg mx-auto">
             Synchronize video playback with friends. Low latency. No sign-up required.
@@ -75,7 +75,7 @@ export default function Home() {
       </div>
 
       <div className="absolute bottom-10 text-zinc-800 text-xs">
-        © 2026 WatchiParty Inc.
+        © 2026 Er. Anish Chaulagain.
       </div>
     </main>
   );

@@ -4,6 +4,7 @@ import { use, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import VideoPlayer from '@/components/VideoPlayer';
 import { useSocket } from '@/hooks/useSocket';
+import { Check, Copy } from 'lucide-react';
 
 export default function RoomPage({ params }: { params: Promise<{ roomId: string }> }) {
     const { roomId } = use(params);
@@ -14,11 +15,11 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
     const [playbackRate, setPlaybackRate] = useState(1);
     const [inputUrl, setInputUrl] = useState('');
     const [isUploading, setIsUploading] = useState(false);
-
+    const [copied, setCopied] = useState(false);
     // Sync Handler
     const handleSyncData = useCallback((data: any) => {
         switch (data.type) {
-            case 'sa_init': // Server Authoritative Init
+            case 'sa_init':
             case 'PLAY':
             case 'PAUSE':
             case 'SEEK':
@@ -101,17 +102,31 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
             setIsUploading(false);
         }
     };
-
+    const copyRoomId = async () => {
+        await navigator.clipboard.writeText(roomId);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+    };
     return (
         <div className="min-h-screen bg-black text-white selection:bg-indigo-500/30">
             {/* Header */}
             <header className="border-b border-white/10 p-4 flex justify-between items-center bg-zinc-950/50 backdrop-blur-md sticky top-0 z-50">
                 <div className="flex items-center gap-4">
                     <h1 className="font-bold text-xl tracking-tight bg-linear-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
-                        WatchiParty
+                        Anisync
                     </h1>
                     <div className="px-3 py-1 bg-zinc-900 rounded-full text-xs font-mono text-zinc-400 border border-zinc-800">
-                        ROOM: <span className="text-white select-all">{roomId}</span>
+                        <div className='flex gap-2'>
+                            <h1>ROOM:</h1>
+                            <span className="text-white select-all">{roomId}</span>
+                        <button
+                            onClick={copyRoomId}
+                            className="hover:text-green-400 transition"
+                            title="Copy Room ID"
+                        >
+                            {copied ? <Check size={16} /> : <Copy size={16} />}
+                        </button>
+                        </div>
                     </div>
                 </div>
 
