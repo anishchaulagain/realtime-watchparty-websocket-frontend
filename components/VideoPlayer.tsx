@@ -15,7 +15,7 @@ interface VideoPlayerProps {
     isHost?: boolean; // If we want host-only controls later
 }
 
-const SYNC_THRESHOLD = 0.5; // Seconds
+const SYNC_THRESHOLD = 2.0; // Seconds (Higher tolerance for network latency)
 
 export default function VideoPlayer({
     url,

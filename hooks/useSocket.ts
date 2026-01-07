@@ -10,7 +10,6 @@ export const useSocket = (roomId: string, onSync: (data: any) => void) => {
     useEffect(() => {
         // Initialize socket connection
         socketRef.current = io(SOCKET_URL, {
-            transports: ['websocket'], // Force WebSocket for better performance
             reconnectionAttempts: 5,
         });
 
