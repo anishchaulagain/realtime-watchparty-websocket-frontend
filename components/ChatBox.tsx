@@ -48,27 +48,35 @@ export default function ChatBox({ username, messages, onSendMessage }: ChatBoxPr
                         <p>Quiet room... say hello!</p>
                     </div>
                 )}
-                {messages.map((msg, i) => (
-                    <div key={i} className={`flex flex-col ${msg.type === 'system' ? 'items-center my-2' : 'items-start'}`}>
-                        {msg.type === 'system' ? (
-                            <span className="text-[10px] text-zinc-500 bg-zinc-800/50 px-2 py-0.5 rounded-full">{msg.text}</span>
-                        ) : (
-                            <div className="max-w-[85%]">
-                                <div className="flex items-baseline gap-2 mb-1">
-                                    <span className={`text-xs font-bold ${msg.user === username ? 'text-indigo-400' : 'text-zinc-400'}`}>
-                                        {msg.user}
-                                    </span>
-                                    <span className="text-[10px] text-zinc-600">
-                                        {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </span>
+                {messages.map((msg, i) => {
+                    const isMe = msg.user === username;
+                    return (
+                        <div key={i} className={`flex flex-col ${msg.type === 'system' ? 'items-center my-2' : (isMe ? 'items-end' : 'items-start')}`}>
+                            {msg.type === 'system' ? (
+                                <span className="text-[10px] text-zinc-500 bg-zinc-800/50 px-2 py-0.5 rounded-full">{msg.text}</span>
+                            ) : (
+                                <div className={`max-w-[85%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                                    <div className="flex items-baseline gap-2 mb-1 px-1">
+                                        {!isMe && (
+                                            <span className="text-xs font-bold text-zinc-400">
+                                                {msg.user}
+                                            </span>
+                                        )}
+                                        <span className="text-[10px] text-zinc-600">
+                                            {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                    </div>
+                                    <p className={`text-sm px-3 py-2 rounded-xl break-words ${isMe
+                                            ? 'bg-indigo-600 text-white rounded-br-sm'
+                                            : 'bg-zinc-800 text-zinc-200 rounded-bl-sm'
+                                        }`}>
+                                        {msg.text}
+                                    </p>
                                 </div>
-                                <p className="text-sm text-zinc-200 bg-zinc-800/80 px-3 py-2 rounded-lg rounded-tl-none break-words">
-                                    {msg.text}
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                ))}
+                            )}
+                        </div>
+                    );
+                })}
             </div>
 
             {/* Input */}
