@@ -1,65 +1,82 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function Home() {
+  const router = useRouter();
+  const [joinId, setJoinId] = useState('');
+
+  const handleCreateRoom = async () => {
+    try {
+      // We could call the backend to create a room entry if we want strict validation
+      // or just generate an ID and let the backend handle the first join as creation.
+      // The backend `roomRouter.post('/create')` exists, let's use it properly.
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/rooms/create`, {
+        method: 'POST'
+      });
+      const data = await res.json();
+      router.push(`/room/${data.roomId}`);
+    } catch (err) {
+      console.error("Failed to create room", err);
+    }
+  };
+
+  const handleJoinRoom = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (joinId.trim()) {
+      router.push(`/room/${joinId.trim()}`);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-zinc-950 text-white selection:bg-indigo-500 selection:text-white">
+      <div className="z-10 max-w-5xl w-full items-center justify-center font-mono text-sm lg:flex flex-col gap-12">
+        <div className="text-center space-y-4 animate-in fade-in zoom-in duration-700">
+          <h1 className="text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+            WatchiParty
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-zinc-400 text-xl max-w-lg mx-auto">
+            Synchronize video playback with friends. Low latency. No sign-up required.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        <div className="flex flex-col sm:flex-row gap-6 w-full max-w-md animate-in slide-in-from-bottom-5 duration-700 delay-200">
+          {/* Create Room */}
+          <button
+            onClick={handleCreateRoom}
+            className="flex-1 group relative px-8 py-4 bg-zinc-900 rounded-2xl border border-zinc-800 hover:border-indigo-500/50 hover:bg-zinc-800 transition-all duration-300 overflow-hidden"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+            <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <span className="relative text-lg font-bold text-zinc-100 group-hover:text-white">
+              Create Room
+            </span>
+          </button>
+
+          {/* Join Room */}
+          <form onSubmit={handleJoinRoom} className="flex-1 flex flex-col gap-2">
+            <input
+              type="text"
+              placeholder="Enter Room ID"
+              value={joinId}
+              onChange={(e) => setJoinId(e.target.value)}
+              className="w-full px-6 py-4 bg-zinc-900 rounded-2xl border border-zinc-800 text-center text-lg placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500 transition-all"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <button
+              type="submit"
+              disabled={!joinId}
+              className="w-full py-2 text-sm font-medium text-zinc-500 hover:text-indigo-400 disabled:opacity-50 transition-colors"
+            >
+              Join Existing →
+            </button>
+          </form>
         </div>
-      </main>
-    </div>
+      </div>
+
+      <div className="absolute bottom-10 text-zinc-800 text-xs">
+        © 2026 WatchiParty Inc.
+      </div>
+    </main>
   );
 }
