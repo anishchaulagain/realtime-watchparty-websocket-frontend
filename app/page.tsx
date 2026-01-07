@@ -31,18 +31,18 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-zinc-950 text-white selection:bg-indigo-500 selection:text-white">
-      <div className="z-10 max-w-5xl w-full items-center justify-center font-mono text-sm lg:flex flex-col gap-12">
+    <main className="flex min-h-screen flex-col items-center justify-center p-6 lg:p-24 bg-zinc-950 text-white selection:bg-indigo-500 selection:text-white">
+      <div className="z-10 max-w-5xl w-full items-center justify-center font-mono text-sm flex flex-col gap-8 lg:gap-12">
         <div className="text-center space-y-4 animate-in fade-in zoom-in duration-700">
-          <h1 className="text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+          <h1 className="text-4xl lg:text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
             Anisync - Watch Live with Friends
           </h1>
-          <p className="text-zinc-400 text-xl max-w-lg mx-auto">
+          <p className="text-zinc-400 text-lg lg:text-xl max-w-lg mx-auto">
             Synchronize video playback with friends. Low latency. No sign-up required.
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-6 w-full max-w-md animate-in slide-in-from-bottom-5 duration-700 delay-200">
+        <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 w-full max-w-md animate-in slide-in-from-bottom-5 duration-700 delay-200">
           {/* Create Room */}
           <button
             onClick={handleCreateRoom}
