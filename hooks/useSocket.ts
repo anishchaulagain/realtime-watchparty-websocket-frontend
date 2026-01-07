@@ -6,6 +6,8 @@ const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001'
 export const useSocket = (roomId: string, onSync: (data: any) => void) => {
     const socketRef = useRef<Socket | null>(null);
     const [isConnected, setIsConnected] = useState(false);
+    const [username, setUsername] = useState<string>('');
+    const [messages, setMessages] = useState<any[]>([]);
 
     useEffect(() => {
         // Initialize socket connection
@@ -28,8 +30,15 @@ export const useSocket = (roomId: string, onSync: (data: any) => void) => {
         });
 
         socket.on('sync', (data: any) => {
-            console.log('Received sync event:', data);
             onSync(data);
+        });
+
+        socket.on('your_name', (name: string) => {
+            setUsername(name);
+        });
+
+        socket.on('receive_message', (message: any) => {
+            setMessages((prev) => [...prev, message]);
         });
 
         return () => {
@@ -43,5 +52,11 @@ export const useSocket = (roomId: string, onSync: (data: any) => void) => {
         }
     };
 
-    return { socket: socketRef.current, isConnected, emitSync };
+    const sendMessage = (text: string) => {
+        if (socketRef.current) {
+            socketRef.current.emit('send_message', { roomId, text });
+        }
+    };
+
+    return { socket: socketRef.current, isConnected, emitSync, username, messages, sendMessage };
 };
