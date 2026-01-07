@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Anisync - Watch Live with Friends",
-  description: "Anisync - Watch Live with Friends",
+  title: "Anisync - Watch Live with Friends",  //title changes
+  description: "Anisync - Watch Live with Friends",  //description changes
 };
 
 export default function RootLayout({
