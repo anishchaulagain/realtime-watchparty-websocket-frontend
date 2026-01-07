@@ -3,6 +3,7 @@
 import { use, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import VideoPlayer from '@/components/VideoPlayer';
+import ChatBox from '@/components/ChatBox';
 import { useSocket } from '@/hooks/useSocket';
 import { Check, Copy } from 'lucide-react';
 
@@ -34,7 +35,7 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
         }
     }, []);
 
-    const { emitSync, isConnected } = useSocket(roomId, handleSyncData);
+    const { emitSync, isConnected, username, messages, sendMessage } = useSocket(roomId, handleSyncData);
 
     // Handlers for Player Events
     const onPlay = () => emitSync('PLAY', { isPlaying: true, currentTime, playbackRate });
@@ -119,13 +120,13 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
                         <div className='flex gap-2'>
                             <h1>ROOM:</h1>
                             <span className="text-white select-all">{roomId}</span>
-                        <button
-                            onClick={copyRoomId}
-                            className="hover:text-green-400 transition"
-                            title="Copy Room ID"
-                        >
-                            {copied ? <Check size={16} /> : <Copy size={16} />}
-                        </button>
+                            <button
+                                onClick={copyRoomId}
+                                className="hover:text-green-400 transition"
+                                title="Copy Room ID"
+                            >
+                                {copied ? <Check size={16} /> : <Copy size={16} />}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -201,27 +202,13 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
                         </div>
                     </div>
 
-                    {/* Room Info / Chat Placeholder */}
-                    <div className="p-6 bg-zinc-900/50 rounded-2xl border border-white/5 flex flex-col justify-between">
-                        <div>
-                            <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-2">Room Stats</h3>
-                            <div className="space-y-2 text-sm text-zinc-300">
-                                <div className="flex justify-between">
-                                    <span>Status</span>
-                                    <span className={isPlaying ? 'text-green-400' : 'text-yellow-400'}>{isPlaying ? 'Playing' : 'Paused'}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Time</span>
-                                    <span className="font-mono">{Math.floor(currentTime / 60)}:{Math.floor(currentTime % 60).toString().padStart(2, '0')}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="mt-8 p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
-                            <p className="text-xs text-indigo-300 text-center">
-                                💡 Tip: Anyone in the room can control playback.
-                            </p>
-                        </div>
+                    {/* Chat System */}
+                    <div className="col-span-1">
+                        <ChatBox
+                            username={username}
+                            messages={messages}
+                            onSendMessage={sendMessage}
+                        />
                     </div>
                 </div>
             </main>
