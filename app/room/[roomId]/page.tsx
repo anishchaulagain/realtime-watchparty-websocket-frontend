@@ -65,40 +65,31 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
         setIsUploading(true);
 
         try {
-            // 1. Get Presigned URL (or upload to server proxy as per current controller)
-            // Current controller: /api/upload/presigned-upload
             const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-            // For MVP we are using the proxy logic or presigned if implemented. 
-            // The uploadController I wrote has /presigned-upload for R2.
+            // Use server-side proxy upload to bypass CORS issues with R2
+            const formData = new FormData();
+            formData.append('video', file);
 
-            const res = await fetch(`${apiBase}/api/upload/presigned-upload`, {
+            const res = await fetch(`${apiBase}/api/upload/proxy-upload`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ filename: file.name, fileType: file.type })
+                body: formData
             });
 
-            const { uploadUrl, fileKey } = await res.json();
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(`Upload failed: ${errorData.error || res.statusText}`);
+            }
 
-            // 2. Upload to R2
-            await fetch(uploadUrl, {
-                method: 'PUT',
-                body: file,
-                headers: { 'Content-Type': file.type }
-            });
-
-            // 3. Get View URL (if private) or construct public URL
-            // If public bucket: https://pub-xxxx.r2.dev/key
-            // If using /video/:key endpoint:
-            const viewRes = await fetch(`${apiBase}/api/upload/video/${fileKey}`);
-            const { url } = await viewRes.json();
+            const { url } = await res.json();
 
             setVideoUrl(url);
             emitSync('URL_CHANGE', { isPlaying: false, currentTime: 0, playbackRate: 1, videoSource: url, videoType: 'upload' });
 
         } catch (err) {
             console.error("Upload failed", err);
-            alert('Upload failed');
+            const errorMessage = err instanceof Error ? err.message : 'Upload failed';
+            alert(errorMessage);
         } finally {
             setIsUploading(false);
         }
