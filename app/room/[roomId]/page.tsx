@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import VideoPlayer from '@/components/VideoPlayer';
 import ChatBox from '@/components/ChatBox';
 import { useSocket } from '@/hooks/useSocket';
-import { Check, Copy } from 'lucide-react';
+import { Check, Copy, Ghost, Loader2 } from 'lucide-react';
 
 export default function RoomPage({ params }: { params: Promise<{ roomId: string }> }) {
     const { roomId } = use(params);
@@ -35,7 +35,7 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
         }
     }, []);
 
-    const { emitSync, isConnected, username, messages, sendMessage } = useSocket(roomId, handleSyncData);
+    const { emitSync, isConnected, isJoined, username, messages, sendMessage, error } = useSocket(roomId, handleSyncData);
 
     // Handlers for Player Events
     const onPlay = () => emitSync('PLAY', { isPlaying: true, currentTime, playbackRate });
@@ -99,6 +99,38 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
     };
+    if (error === 'Room not found') {
+        return (
+            <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center gap-6 p-4">
+                <div className="p-8 bg-zinc-900 rounded-2xl border border-red-500/20 flex flex-col items-center text-center max-w-md w-full">
+                    <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-4">
+                        <Ghost className="text-red-500" size={32} />
+                    </div>
+                    <h2 className="text-xl font-bold text-white mb-2">Room Not Found</h2>
+                    <p className="text-zinc-400 mb-6">The room you are trying to join does not exist or has been closed.</p>
+                    <button
+                        onClick={() => router.push('/')}
+                        className="px-6 py-2 bg-white text-black font-semibold rounded-xl hover:bg-zinc-200 transition-colors w-full"
+                    >
+                        Go Back Home
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    // Loading State - Wait until we have joined the room
+    if (!isJoined) {
+        return (
+            <div className="min-h-screen bg-black text-white flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="animate-spin text-indigo-500" size={48} />
+                    <p className="text-zinc-500 text-sm font-medium animate-pulse uppercase tracking-widest">Connecting to Room...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-black text-white selection:bg-indigo-500/30">
             {/* Header */}

@@ -6,8 +6,10 @@ const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001'
 export const useSocket = (roomId: string, onSync: (data: any) => void) => {
     const socketRef = useRef<Socket | null>(null);
     const [isConnected, setIsConnected] = useState(false);
+    const [isJoined, setIsJoined] = useState(false);
     const [username, setUsername] = useState<string>('');
     const [messages, setMessages] = useState<any[]>([]);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         // Initialize socket connection
@@ -27,6 +29,12 @@ export const useSocket = (roomId: string, onSync: (data: any) => void) => {
         socket.on('disconnect', () => {
             console.log('Disconnected from WebSocket');
             setIsConnected(false);
+            setIsJoined(false);
+        });
+
+        socket.on('error', (err: any) => {
+            // console.error('Socket error:', err);
+            setError(typeof err === 'string' ? err : 'Unknown error');
         });
 
         socket.on('sync', (data: any) => {
@@ -35,6 +43,7 @@ export const useSocket = (roomId: string, onSync: (data: any) => void) => {
 
         socket.on('your_name', (name: string) => {
             setUsername(name);
+            setIsJoined(true);
         });
 
         socket.on('receive_message', (message: any) => {
@@ -58,5 +67,5 @@ export const useSocket = (roomId: string, onSync: (data: any) => void) => {
         }
     };
 
-    return { socket: socketRef.current, isConnected, emitSync, username, messages, sendMessage };
+    return { socket: socketRef.current, isConnected, isJoined, emitSync, username, messages, sendMessage, error };
 };
