@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, User, Ghost } from 'lucide-react';
+import { EMOJI_MAP } from '../utils/emojis';
 
 interface ChatBoxProps {
     username: string;
@@ -23,6 +24,46 @@ export default function ChatBox({ username, messages, onSendMessage, className =
         if (input.trim()) {
             onSendMessage(input.trim());
             setInput('');
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        // use e.code to get the physical key (Digit0...Digit9)
+        if (e.code.startsWith('Digit')) {
+            const digit = e.code.replace('Digit', '');
+
+            // If Shift is pressed, standard behavior (symbols like !, @, #)
+            if (e.shiftKey) {
+                return;
+            }
+
+            // Check Caps Lock state
+            const isCapsLockOn = e.getModifierState('CapsLock');
+
+            if (isCapsLockOn) {
+                // Caps Lock ON -> Allow default (Numbers 0-9)
+                return;
+            }
+
+            // Caps Lock OFF -> Insert Emoji
+            if (EMOJI_MAP[digit]) {
+                e.preventDefault();
+
+                const emoji = EMOJI_MAP[digit];
+
+                // Insert at cursor position
+                const inputEl = e.currentTarget;
+                const start = inputEl.selectionStart || 0;
+                const end = inputEl.selectionEnd || 0;
+
+                const newValue = input.substring(0, start) + emoji + input.substring(end);
+                setInput(newValue);
+
+                setTimeout(() => {
+                    inputEl.selectionStart = start + emoji.length;
+                    inputEl.selectionEnd = start + emoji.length;
+                }, 0);
+            }
         }
     };
 
@@ -87,6 +128,7 @@ export default function ChatBox({ username, messages, onSendMessage, className =
                     placeholder="Type a message..."
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     className="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none transition-colors"
                 />
                 <button
