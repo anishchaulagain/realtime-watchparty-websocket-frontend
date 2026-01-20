@@ -8,11 +8,13 @@ export const useSocket = (roomId: string, onSync: (data: any) => void) => {
     const [isConnected, setIsConnected] = useState(false);
     const [username, setUsername] = useState<string>('');
     const [messages, setMessages] = useState<any[]>([]);
+    const [lastPong, setLastPong] = useState<number | null>(null);
 
     useEffect(() => {
         // Initialize socket connection
         socketRef.current = io(SOCKET_URL, {
-            reconnectionAttempts: 5,
+            reconnectionAttempts: 10, // Increased for better stability
+            timeout: 10000,
         });
 
         const socket = socketRef.current;
@@ -41,7 +43,20 @@ export const useSocket = (roomId: string, onSync: (data: any) => void) => {
             setMessages((prev) => [...prev, message]);
         });
 
+        // Heartbeat mechanism - Ping every 25s to keep Render alive
+        const heartbeatInterval = setInterval(() => {
+            if (socket.connected) {
+                socket.emit('ping', { roomId, timestamp: Date.now() });
+            }
+        }, 25000);
+
+        socket.on('pong', (data: any) => {
+            console.log('Heartbeat acknowledged by server', data);
+            setLastPong(Date.now());
+        });
+
         return () => {
+            clearInterval(heartbeatInterval);
             socket.disconnect();
         };
     }, [roomId, onSync]);
@@ -58,5 +73,5 @@ export const useSocket = (roomId: string, onSync: (data: any) => void) => {
         }
     };
 
-    return { socket: socketRef.current, isConnected, emitSync, username, messages, sendMessage };
+    return { socket: socketRef.current, isConnected, emitSync, username, messages, sendMessage, lastPong };
 };
