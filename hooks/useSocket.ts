@@ -54,6 +54,7 @@ export const useSocket = (roomId: string, onSync: (data: any) => void) => {
         // Heartbeat mechanism - Ping every 25s to keep Render alive
         const heartbeatInterval = setInterval(() => {
             if (socket.connected) {
+                console.log('heartbeat request (socket)');
                 socket.emit('ping', { roomId, timestamp: Date.now() });
             }
         }, 25000);
@@ -63,8 +64,16 @@ export const useSocket = (roomId: string, onSync: (data: any) => void) => {
             setLastPong(Date.now());
         });
 
+        // HTTP Heartbeat - Render specifically tracks HTTP activity
+        const httpHeartbeatInterval = setInterval(() => {
+            const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+            console.log('heartbeat request (http)');
+            fetch(`${apiBase}/health`).catch(() => { });
+        }, 45000); // Every 45 seconds
+
         return () => {
             clearInterval(heartbeatInterval);
+            clearInterval(httpHeartbeatInterval);
             socket.disconnect();
         };
     }, [roomId, onSync]);
