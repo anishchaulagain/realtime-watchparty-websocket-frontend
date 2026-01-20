@@ -35,7 +35,7 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
         }
     }, []);
 
-    const { emitSync, isConnected, isJoined, username, messages, sendMessage, error } = useSocket(roomId, handleSyncData);
+    const { emitSync, isConnected, isJoined, username, messages, sendMessage, error, lastPong } = useSocket(roomId, handleSyncData);
 
     // Handlers for Player Events
     const onPlay = () => emitSync('PLAY', { isPlaying: true, currentTime, playbackRate });
@@ -161,7 +161,7 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
                     >
                         Leave
                     </button>
-                    <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-red-500'}`} />
+                    <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-red-500'} ${lastPong ? 'animate-pulse' : ''}`} title={lastPong ? `Last keep-alive: ${new Date(lastPong).toLocaleTimeString()}` : 'Connecting...'} />
                     <span className="text-xs text-zinc-500 uppercase tracking-widest font-semibold hidden sm:block">
                         {isConnected ? 'Live Sync' : 'Offline'}
                     </span>
