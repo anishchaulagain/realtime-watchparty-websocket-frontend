@@ -27,7 +27,7 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
             case 'URL_CHANGE':
                 if (data.videoSource) setVideoUrl(data.videoSource);
                 setIsPlaying(data.isPlaying);
-                setCurrentTime(data.currentTime); // You might want to account for network latency roughly here
+                setCurrentTime(data.currentTime); 
                 setPlaybackRate(data.playbackRate || 1);
                 break;
             default:
@@ -45,9 +45,6 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
         emitSync('SEEK', { isPlaying, currentTime: seconds, playbackRate });
     };
     const onProgress = ({ playedSeconds }: { playedSeconds: number }) => {
-        // Periodic sync update if finding drift?
-        // For now, Player component handles drift check against `currentTime`.
-        // We could update local state so if we pause, we know where we are.
         setCurrentTime(playedSeconds);
     };
 
