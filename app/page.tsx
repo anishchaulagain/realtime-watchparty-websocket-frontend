@@ -9,9 +9,6 @@ export default function Home() {
 
   const handleCreateRoom = async () => {
     try {
-      // We could call the backend to create a room entry if we want strict validation
-      // or just generate an ID and let the backend handle the first join as creation.
-      // The backend `roomRouter.post('/create')` exists, let's use it properly.
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/rooms/create`, {
         method: 'POST'
       });
